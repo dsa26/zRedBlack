@@ -15,7 +15,7 @@ public class Tree<K, V> {
     }
 
     public void put(K key, V value) {
-        this.ROOT = put(key, value, ROOT, null);
+        this.ROOT = fix(put(key, value, ROOT, null));
     }
 
     private Node<K, V> put(K key, V value, Node<K, V> node, Node<K, V> parent) {
@@ -31,6 +31,62 @@ public class Tree<K, V> {
             node.left = put(key, value, node.left, node);
             return node;
         }
+    }
+
+    private Node<K, V> fix(Node<K, V> node) {
+        return fixDouble(fixRight(fixSplit(node)));
+    }
+
+    private Node<K, V> fixRight(Node<K, V> node) { // Using return type to avoid tracking parent -- Hope to potentially
+                                                   // remove parent tracking
+        if (node == null)
+            return null;
+        if (node.right != null) {
+            if (node.right.color == Node.Color.RED) {
+                Node<K, V> pivot = node.right;
+                node.right = pivot.left;
+                pivot.left = node;
+                pivot.right = fixRight(pivot.right);
+                return pivot;
+            }
+        }
+        node.left = fixRight(node.left);
+        node.right = fixRight(node.right);
+        return node;
+    }
+
+    private Node<K, V> fixSplit(Node<K, V> node) {
+        if (node == null)
+            return null;
+        if (node.left != null && node.right != null) {
+            if (node.left.color == Node.Color.RED && node.right.color == Node.Color.RED) {
+                node.left.color = Node.Color.BLACK;
+                node.right.color = Node.Color.BLACK;
+                node.color = Node.Color.RED; // Assuming current is black because previous iterations should've caught
+                                             // that
+            }
+        }
+        node.left = fixSplit(node.left);
+        node.right = fixSplit(node.right);
+        return node;
+    }
+
+    private Node<K, V> fixDouble(Node<K, V> node) {
+        if (node == null)
+            return null;
+        if (node.left != null) {
+            if (node.color == Node.Color.RED && node.left.color == Node.Color.RED) {
+                Node<K, V> pivot = node;
+                node.left.color = Node.Color.BLACK;
+                node.color = Node.Color.BLACK;
+                node.parent.left = node.right; // Safe assuming left here because rights would already have been caught
+                pivot.right = node.parent;
+                return pivot;
+            }
+        }
+        node.left = fixDouble(node.left);
+        node.right = fixDouble(node.right);
+        return node;
     }
 
     @FunctionalInterface
