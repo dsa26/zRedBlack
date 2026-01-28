@@ -14,6 +14,18 @@ public class Tree<K, V> {
         return ROOT == null;
     }
 
+    public int size() {
+        return size(ROOT);
+    }
+
+    private int size(Node<K, V> node) {
+        if (node == null)
+            return 0;
+        if (node.left == null && node.right == null)
+            return 1;
+        return 1 + size(node.left) + size(node.right);
+    }
+
     public void put(K key, V value) {
         this.ROOT = put(key, value, ROOT);
         this.ROOT = fix(this.ROOT);
@@ -96,7 +108,9 @@ public class Tree<K, V> {
     }
 
     public void display() {
+        System.out.println("----------");
         preorder(ROOT);
+        System.out.println("----------");
     }
 
     private void preorder(Node<K, V> node) {
@@ -123,5 +137,100 @@ public class Tree<K, V> {
         System.out
                 .println("Run: " + node.key + " Left: " + node.left + " Right: "
                         + node.right + " Color: " + node.color);
+    }
+
+    public Node<K, V> get(K key) {
+        Node<K, V> current = ROOT;
+        while (current != null) {
+            if (equalTo.f(current.key, key)) {
+                return current;
+            } else if (lessThan.f(current.key, key)) {
+                current = current.right;
+            } else {
+                current = current.left;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean contains(K key) {
+        return get(key) != null;
+    }
+
+    public Node<K, V> min() {
+        return min(ROOT);
+    }
+
+    private Node<K, V> min(Node<K, V> node) {
+        if (node == null)
+            return null;
+        Node<K, V> current = node;
+        while (current.left != null)
+            current = current.left;
+        return current;
+    }
+
+    public Node<K, V> max() {
+        return max(ROOT);
+    }
+
+    private Node<K, V> max(Node<K, V> node) {
+        if (node == null)
+            return null;
+        Node<K, V> current = node;
+        while (current.right != null)
+            current = current.right;
+        return current;
+    }
+
+    public Node<K, V> floor(K key) {
+        Node<K, V> current = ROOT;
+        Node<K, V> floor = null;
+        while (current != null) {
+            if (lessThan.f(current.key, key)) {
+                floor = current;
+                current = current.right;
+            } else {
+                current = current.left;
+            }
+        }
+        return floor;
+    }
+
+    public Node<K, V> ceiling(K key) {
+        Node<K, V> current = ROOT;
+        Node<K, V> ceiling = null;
+        while (current != null) {
+            if (lessThan.f(current.key, key)) {
+                current = current.right;
+            } else {
+                ceiling = current;
+                current = current.left;
+            }
+        }
+        return ceiling;
+    }
+
+    public int height() {
+        return height(ROOT);
+    }
+
+    private int height(Node<K, V> node) {
+        if (node == null)
+            return 0;
+        if (node.left == null && node.right == null)
+            return 1;
+        return 1 + Math.max(height(node.left), height(node.right)); // Gets the length of the maximal path to a leaf
+    }
+
+    public String toString() {
+        return toString(ROOT);
+    }
+
+    private String toString(Node<K, V> node) {
+        if (node == null)
+            return "";
+        return toString(node.left) + node.key + " " + toString(node.right);
     }
 }
