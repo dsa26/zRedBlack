@@ -63,6 +63,10 @@ public class Tree<K, V> {
             if (node.right.color == Node.Color.RED) {
                 Node<K, V> pivot = node.right;
                 node.right = pivot.left; // What if this is RED? -- Explained in video
+                // Forgot to explain in video. So basically, pivot.left cannot be RED because
+                // the only way it is RED is if a new node was inserted there. This will not
+                // happen before the right RED is corrected (only one node inserted at once),
+                // and so pivot.left is guaranteed to be BLACK or null.
                 pivot.left = node;
                 pivot.color = node.color; // Ensures recursion works
                 node.color = Node.Color.RED;
